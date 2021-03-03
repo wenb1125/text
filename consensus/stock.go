@@ -1,15 +1,14 @@
-package pos
+package consensus
 
 import (
 	"fmt"
-	"xianfengChain/chain"
 )
 
 /**
  *
  */
 type ProofStock struct {
-	Block chain.Block
+	Block BlockInterface
 }
 
 

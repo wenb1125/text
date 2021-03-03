@@ -1,11 +1,10 @@
-package pow
+package consensus
 
 import (
 	"bytes"
 	"crypto/sha256"
 	"fmt"
 	"math/big"
-	"xianfengChain/chain"
 	"xianfengChain/utils"
 )
 
@@ -18,7 +17,7 @@ const DIFFICULT = 10 //初始难度为10，即大整数到底开头有10个0
  * 工作量证明
  */
 type ProofWork struct {
-	Block  chain.Block
+	Block  BlockInterface
 	Target *big.Int
 }
 
@@ -47,18 +46,20 @@ func (work ProofWork) SearchNonce() ([32]byte,int64) {
 	}
 }
 
-func CalculateBlockHash(block chain.Block, nonce int64) [32]byte {
-	heightByte, _ := utils.Int2Byte(block.Height)
-	versionByte, _ := utils.Int2Byte(block.Version)
-	timeByte, _ := utils.Int2Byte(block.Timestamp)
+func CalculateBlockHash(block BlockInterface, nonce int64) [32]byte {
+	heightByte, _ := utils.Int2Byte(block.GetHeight())
+	versionByte, _ := utils.Int2Byte(block.GetVersion())
+	timeByte, _ := utils.Int2Byte(block.GetTimeStamp())
 	nonceByte, _ := utils.Int2Byte(nonce)
+	preHash := block.GetPreHash()
+	data := block.GetData()
 	bk := bytes.Join([][]byte{
 		heightByte,
 		versionByte,
-		block.PreHash[:],
+		preHash[:],
 		timeByte,
 		nonceByte,
-		block.Data},
+		data},
 		[]byte{})
 	return sha256.Sum256(bk)
 }
