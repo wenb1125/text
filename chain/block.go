@@ -1,12 +1,8 @@
 package chain
 
 import (
-	"bytes"
-	"crypto/sha256"
-	"fmt"
 	"time"
 	"xianfengChain/consensus"
-	"xianfengChain/utils"
 )
 
 const VERSION = 2.0
@@ -27,17 +23,17 @@ type Block struct {
 /**
  * 该方法用于计算区块的hash值
  */
-func (block *Block) SetHash()  {
-	heightByte, _ := utils.Int2Byte(block.Height)
-	versionByte, _ := utils.Int2Byte(block.Version)
-	timeByte, _ := utils.Int2Byte(block.Timestamp)
-	nonceByte, _ := utils.Int2Byte(block.Nonce)
-
-	bk := bytes.Join([][]byte{heightByte,versionByte,block.PreHash[:],timeByte,nonceByte},[]byte{})
-	hash := sha256.Sum256(bk)
-	block.Hash = hash
-	fmt.Println("哈希值：", hash)
-}
+//func (block *Block) SetHash()  {
+//	heightByte, _ := utils.Int2Byte(block.Height)
+//	versionByte, _ := utils.Int2Byte(block.Version)
+//	timeByte, _ := utils.Int2Byte(block.Timestamp)
+//	nonceByte, _ := utils.Int2Byte(block.Nonce)
+//
+//	bk := bytes.Join([][]byte{heightByte,versionByte,block.PreHash[:],timeByte,nonceByte},[]byte{})
+//	hash := sha256.Sum256(bk)
+//	block.Hash = hash
+//	fmt.Println("哈希值：", hash)
+//}
 
 /**
  * 创建一个新的区块函数
@@ -50,13 +46,21 @@ func CreateBlock(height int64, prevHash [32]byte, data []byte) Block {
 	block.Timestamp = time.Now().Unix()
 	block.Data = data
 
-	block.SetHash()//计算hash
+
 	//尝试给nonce值赋值
-	//共识机制：pow
-	cons := consensus.NewPoW()
-	cons.Run()
+	//共识机制：pow、pos
+	//确定选用pow实现共识机制
 
+	//别人写的
+	//work := pow.ProofWork{block}
+	//nonce := work.FindNonce()
+	//block.Nonce = nonce
+	proof := consensus.NewProofWork(block)
+	hash, nonce := proof.SearchNonce()
+	block.Nonce = nonce
+	block.Hash = hash
 
+	//block.SetHash()//计算hash
 	return block
 }
 
@@ -70,7 +74,12 @@ func CreateGenesisBlock(data []byte) Block {
 	genesis.Version = VERSION
 	genesis.Timestamp = time.Now().Unix()
 	genesis.Data = data
-	genesis.SetHash()//计算hash
+
+	proof := consensus.NewProofWork(genesis)
+	hash, nonce := proof.SearchNonce()
+	genesis.Nonce = nonce
+	genesis.Hash = hash
+	//genesis.SetHash()//计算hash
 	return genesis
 }
 
