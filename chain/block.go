@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"time"
+	"xianfengChain/consensus"
 	"xianfengChain/utils"
 )
 
@@ -50,6 +51,12 @@ func CreateBlock(height int64, prevHash [32]byte, data []byte) Block {
 	block.Data = data
 
 	block.SetHash()//计算hash
+	//尝试给nonce值赋值
+	//共识机制：pow
+	cons := consensus.NewPoW()
+	cons.Run()
+
+
 	return block
 }
 
