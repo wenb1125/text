@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/boltdb/bolt-master"
+	"os"
 	"xianfengChain/chain"
 )
 /**
@@ -15,11 +17,18 @@ import (
  * 6.多个节点直接同步数据
  */
 
+const DBFILE = "xianfneg.db"
+
 /**
  * 项目的主入口
  */
 func main() {
 	fmt.Println("hello!!!")
+
+	db, err := bolt.Open(DBFILE,0600,nil)
+	if err != nil {
+		panic(err.Error())
+	}
 
 	blockchain := chain.CreatChainWithGenesis([]byte("hello"))
 
@@ -50,6 +59,17 @@ func main() {
 	//fmt.Println("区块1: ", block1)
 	//block2 := chain.CreateBlock(gensis.Height,block1.Hash,nil)
 	//fmt.Println("区块2: ", block2)
+
+	bolt.Open()
+	db := bolt.DB{}
+	//读
+	db.View(func(tx *bolt.Tx) error {
+		return nil
+	})
+	//写
+	db.Update(func(tx *bolt.Tx) error {
+		return nil
+	})
 }
 
 
