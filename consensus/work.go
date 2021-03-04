@@ -31,13 +31,15 @@ func (work ProofWork) SearchNonce() ([32]byte,int64) {
 	//1.给定一个nonce值,重新计算带有nonce的区块哈希
 	var nonce int64
 	nonce = 0
-
+	hashBig := new(big.Int)
 	for {
 		hash := CalculateBlockHash(work.Block, nonce)
 		//2.系统给定的值
 		target := work.Target
 		//3.拿1和2比较
-		result := bytes.Compare(hash[:], target.Bytes())
+		hashBig.SetBytes(hash[:])
+		result := hashBig.Cmp(target)
+		//result := bytes.Compare(hash[:], target.Bytes())
 		//4.判断结果,区块哈希 < 给定值, 返回nonce; 否则nonce自增
 		if result == -1 {
 			return hash,nonce

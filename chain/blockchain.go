@@ -7,9 +7,9 @@ type BlockChain struct {
 	Blocks []Block
 }
 
-func NewBlockChain() BlockChain {
-	return BlockChain{}
-}
+//func NewBlockChain() BlockChain {
+//	return BlockChain{}
+//}
 
 /**
  * 创建一个区块链实例，该实例携带一个创世区块
