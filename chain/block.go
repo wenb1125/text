@@ -1,11 +1,14 @@
 package chain
 
 import (
+	"bytes"
+	"encoding/gob"
 	"time"
 	"xianfengChain/consensus"
 )
 
 const VERSION = 2.0
+
 /**
  * 区块数据结构的定义
  */
@@ -13,11 +16,11 @@ type Block struct {
 	Height  int64
 	Version int64
 	PreHash [32]byte
-	Hash	[32]byte//当前区块hash
+	Hash    [32]byte //当前区块hash
 	//默克尔根
 	Timestamp int64
 	Nonce     int64
-	Data      []byte//区块体
+	Data      []byte //区块体
 }
 
 /**
@@ -36,6 +39,28 @@ type Block struct {
 //}
 
 /**
+ * 区块的序列化，序列化为[]byte数据类型
+ */
+func (block *Block) Serialize() ([]byte, error) {
+	buff := new(bytes.Buffer)
+	encoder := gob.NewEncoder(buff)
+	err := encoder.Encode(&block)
+	return buff.Bytes(), err
+}
+
+/**
+ * 区块的反序列化操作，传入[]byte，返回Block结构体或者error
+ */
+func Deserialize(data []byte) (Block, error) {
+	var block Block
+	//reader := new(bytes.Reader)
+	//reader.Read(data)
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+	err := decoder.Decode(&block)
+	return block, err
+}
+
+/**
  * 创建一个新的区块函数
  */
 func CreateBlock(height int64, prevHash [32]byte, data []byte) Block {
@@ -45,7 +70,6 @@ func CreateBlock(height int64, prevHash [32]byte, data []byte) Block {
 	block.Version = VERSION
 	block.Timestamp = time.Now().Unix()
 	block.Data = data
-
 
 	//尝试给nonce值赋值
 	//共识机制：pow、pos
@@ -70,7 +94,7 @@ func CreateBlock(height int64, prevHash [32]byte, data []byte) Block {
 func CreateGenesisBlock(data []byte) Block {
 	genesis := Block{}
 	genesis.Height = 0
-	genesis.PreHash = [32]byte{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+	genesis.PreHash = [32]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	genesis.Version = VERSION
 	genesis.Timestamp = time.Now().Unix()
 	genesis.Data = data
@@ -98,4 +122,3 @@ func (block Block) GetPreHash() [32]byte {
 func (block Block) GetData() []byte {
 	return block.Data
 }
-
