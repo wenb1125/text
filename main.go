@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/boltdb/bolt-master"
-	"os"
 	"xianfengChain/chain"
 )
 /**
@@ -25,51 +24,36 @@ const DBFILE = "xianfneg.db"
 func main() {
 	fmt.Println("hello!!!")
 
-	db, err := bolt.Open(DBFILE,0600,nil)
+	engine, err := bolt.Open(DBFILE,0600,nil)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	blockchain := chain.CreatChainWithGenesis([]byte("hello"))
-
-	blockchain.AddNewBlock([]byte("block1"))
-	blockchain.AddNewBlock([]byte("block2"))
-	fmt.Println("当前共有区块个数： ", len(blockchain.Blocks))
-	//fmt.Println(blockchain.Blocks[0])
-	//fmt.Println(blockchain.Blocks[1])
-	//fmt.Println(blockchain.Blocks[2])
-
-	block0 := blockchain.Blocks[0]
-	block0SerBytes, err := block0.Serialize()
+	blockChain := chain.NewBlockChain(engine)
+	//创世区块
+	blockChain.CreatGenesis([]byte("hello word"))
+	//新增一个区块
+	err = blockChain.AddNewBlock([]byte("hello"))
 	if err != nil {
-		fmt.Println("序列化区块0出现错误")
+		fmt.Println(err.Error())
 		return
 	}
-	deBlock0, err := chain.Deserialize(block0SerBytes)
+	//获取区块
+	//lastBlock, err := blockChain.GetLastBlock()
+	//if err != nil {
+	//	fmt.Println(err.Error())
+	//	return
+	//}
+	//fmt.Println(lastBlock)
+
+	allBlocks, err := blockChain.GetAllBlocks()
 	if err != nil {
-		fmt.Println("反序列化区块0出现错误，程序已停止")
+		fmt.Println(err.Error())
 		return
 	}
-	fmt.Println(string(deBlock0.Data))
-
-
-	//gensis := chain.CreateGenesisBlock([]byte("hello"))
-	//fmt.Println("区块0: ", gensis)
-	//block1 := chain.CreateBlock(gensis.Height,gensis.Hash,nil)
-	//fmt.Println("区块1: ", block1)
-	//block2 := chain.CreateBlock(gensis.Height,block1.Hash,nil)
-	//fmt.Println("区块2: ", block2)
-
-	bolt.Open()
-	db := bolt.DB{}
-	//读
-	db.View(func(tx *bolt.Tx) error {
-		return nil
-	})
-	//写
-	db.Update(func(tx *bolt.Tx) error {
-		return nil
-	})
+	for _, block := range allBlocks {
+		fmt.Println(block)
+	}
 }
 
 
