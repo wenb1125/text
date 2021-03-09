@@ -11,7 +11,7 @@ import (
 //256位二进制
 //思路：给一个大整数，初始值为1，根据自己需要的难度进行左移位，左移位的位数是256-0的个数
 
-const DIFFICULT = 10 //初始难度为10，即大整数到底开头有10个0
+const DIFFICULTY = 16 //初始难度为10，即大整数到底开头有10个0
 
 /**
  * 工作量证明
@@ -37,12 +37,12 @@ func (work ProofWork) SearchNonce() ([32]byte,int64) {
 		//2.系统给定的值
 		target := work.Target
 		//3.拿1和2比较
-		hashBig.SetBytes(hash[:])
+		hashBig := hashBig.SetBytes(hash[:])
 		result := hashBig.Cmp(target)
 		//result := bytes.Compare(hash[:], target.Bytes())
 		//4.判断结果,区块哈希 < 给定值, 返回nonce; 否则nonce自增
 		if result == -1 {
-			return hash,nonce
+			return hash, nonce
 		}
 		nonce++
 	}
@@ -54,14 +54,13 @@ func CalculateBlockHash(block BlockInterface, nonce int64) [32]byte {
 	timeByte, _ := utils.Int2Byte(block.GetTimeStamp())
 	nonceByte, _ := utils.Int2Byte(nonce)
 	preHash := block.GetPreHash()
-	data := block.GetData()
 	bk := bytes.Join([][]byte{
 		heightByte,
 		versionByte,
 		preHash[:],
 		timeByte,
 		nonceByte,
-		data},
+		},
 		[]byte{})
 	return sha256.Sum256(bk)
 }

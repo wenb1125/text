@@ -21,7 +21,7 @@ type BlockInterface interface {
 
 func NewProofWork(block BlockInterface) Consensus {
 	init := big.NewInt(1)
-	init.Lsh(init, 256-DIFFICULT)
+	init.Lsh(init, 256 - DIFFICULTY)
 	return ProofWork{block, init}
 }
 

@@ -101,8 +101,8 @@ func CreateGenesisBlock(data []byte) Block {
 
 	proof := consensus.NewProofWork(genesis)
 	hash, nonce := proof.SearchNonce()
-	genesis.Nonce = nonce
 	genesis.Hash = hash
+	genesis.Nonce = nonce
 	//genesis.SetHash()//计算hash
 	return genesis
 }
