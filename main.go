@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"github.com/boltdb/bolt-master"
 	"xianfengChain/chain"
+	"xianfengChain/client"
 )
 /**
  * 步骤
@@ -22,23 +22,27 @@ const DBFILE = "xianfneg.db"
  * 项目的主入口
  */
 func main() {
-	fmt.Println("hello!!!")
+	//fmt.Println("hello!!!")
 
 	engine, err := bolt.Open(DBFILE,0600,nil)
 	defer engine.Close()
 	if err != nil {
 		panic(err.Error())
 	}
+	blockChian := chain.NewBlockChain(engine)
 
-	blockChain := chain.NewBlockChain(engine)
-	//创世区块
-	blockChain.CreateGenesis([]byte("hello word"))
-	//新增一个区块
-	err = blockChain.AddNewBlock([]byte("hello"))
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
+	cli := client.Client{blockChian}
+	cli.Run()
+
+	//blockChain := chain.NewBlockChain(engine)
+	////创世区块
+	//blockChain.CreateGenesis([]byte("hello word"))
+	////新增一个区块
+	//err = blockChain.AddNewBlock([]byte("hello"))
+	//if err != nil {
+	//	fmt.Println(err.Error())
+	//	return
+	//}
 	//获取区块
 	//lastBlock, err := blockChain.GetLastBlock()
 	//if err != nil {
@@ -57,14 +61,14 @@ func main() {
 	//}
 
 	//通过迭代器的方法获取区块
-	for blockChain.HasNext(){
-		block := blockChain.Next()
-		fmt.Printf("区块:%d ", block.Height)
-		fmt.Printf("区块hash:%v ", block.Hash)
-		fmt.Printf("前区块hash:%v ", block.PreHash)
-		fmt.Printf("区块数据:%s ", block.Data)
-		fmt.Println()
-	}
+	//for blockChain.HasNext(){
+	//	block := blockChain.Next()
+	//	fmt.Printf("区块:%d ", block.Height)
+	//	fmt.Printf("区块hash:%v ", block.Hash)
+	//	fmt.Printf("前区块hash:%v ", block.PreHash)
+	//	fmt.Printf("区块数据:%s ", block.Data)
+	//	fmt.Println()
+	//}
 }
 
 
