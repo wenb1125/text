@@ -23,7 +23,6 @@ const DBFILE = "xianfneg.db"
  */
 func main() {
 	//fmt.Println("hello!!!")
-
 	engine, err := bolt.Open(DBFILE,0600,nil)
 	defer engine.Close()
 	if err != nil {
